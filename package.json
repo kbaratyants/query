@@ -6,10 +6,13 @@
   "scripts": {
     "dev": "vite --port=3200 --host",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "uvu -r tsm tests"
   },
   "devDependencies": {
     "typescript": "^4.9.3",
-    "vite": "^4.0.0"
+    "uvu": "^0.5.6",
+    "vite": "^4.0.0",
+    "tsm": "^2.3.0"
   }
 }

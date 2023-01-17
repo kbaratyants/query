@@ -77,7 +77,7 @@ const fullMapping = Object.assign({}, mapping, reverse(mapping));
  * @param {String} text
  * @return {Array<char>}
  */
-export function transliterate(text: string) : any {
+export function oldTransliterate(text: string) : any {
     text = text.toLowerCase();
 
     // Длинна максимального вхождения пример: Sch, shh - щ = 3
@@ -116,6 +116,64 @@ export function transliterate(text: string) : any {
     }
 
     return result.filter((item: any, index) => copies[index] !== item.length);
+}
+
+export function transliterate(text: string) : any {
+    text = text.toLowerCase();
+
+    // Длинна максимального вхождения пример: Sch, shh - щ = 3
+    const maxLiteral = 3;
+    const result: string[][] = [];
+    const margins: number[] = [];
+    const copies: number[] = [];
+    const textLength = text.length;
+
+    // Инициализируий цикл (maxLiteral итераций)
+    for (let i = 0; i < maxLiteral; i++) {
+        result[i] = [];
+        margins[i] = 0;
+        copies[i] = 0;
+    }
+
+    for (let strPos = 0; strPos < textLength; strPos++) {
+        for (let i = 0; i < maxLiteral; i++) {
+
+            const subStr = text.substr(strPos, i + 1);
+
+            if (fullMapping[subStr as keyof typeof fullMapping] && subStr.length === i + 1) {
+                result[i].push(fullMapping[subStr as keyof typeof fullMapping]);
+                margins[i] += subStr.length;
+            } else {
+                for (let deep = 1; deep <= i; deep++) {
+                    if (result[i - deep][margins[i]]) {
+                        result[i].push(result[i - deep][margins[i]]);
+                        margins[i] += margins[i - deep] - margins[i];
+                        copies[i]++;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    const array = [''];
+    result.filter((item: any, index) => copies[index] !== item.length)[0].forEach((item: any) => {
+        if (item.length >= 2) {
+            let copy = [...array];
+            for (let i = 0; i < item.length - 1; i++) {
+                array.push(...copy.reverse());
+            }
+            for (let i = 0; i < array.length; i++) {
+                array[i] += item[i % item.length];
+            }
+        } else {
+            for (let i = 0; i < array.length; i++) {
+                array[i] += item[0];
+            }
+        }
+    });
+
+    return array;
 }
 
 export function getPermutation(array: any[], prefix = '') {

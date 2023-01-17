@@ -1,6 +1,6 @@
 export default class Trie {
-    map:{[key:string]:Trie} = {};
-    isWord:boolean = false;
+    map: { [key:string]: Trie } = {};
+    isWord: boolean = false;
     constructor() {
     }
 
@@ -8,8 +8,8 @@ export default class Trie {
         	this.add(word, 0, this)
            }
 
-    public search(word: string): boolean {
-                return this.find(word,0,this)
+    public search(word: string) : boolean {
+                return this.find(word, 0, this)
     	   }
 
     private add(word: string, index: number, letterMap: Trie): void {
@@ -17,13 +17,13 @@ export default class Trie {
     	  		letterMap.isWord = true
     	  		return; 
         	}
-  		if(!letterMap.map[word.charAt(index)]){
-    	  		letterMap.map[word.charAt(index)] = new Trie()
+  		if(!letterMap.map[word.toString().charAt(index)]){
+    	  		letterMap.map[word.toString().charAt(index)] = new Trie()
   		}
-        	return this.add(word,index+1,letterMap.map[word.charAt(index)])
+        	return this.add(word,index+1,letterMap.map[word.toString().charAt(index)])
     	    }
 
-    private find(word:string,index:number,letterMap:Trie):boolean{
+    private find(word:string, index:number, letterMap:Trie):boolean{
   		  if(index == word.length){
     			  if(letterMap.isWord){
       				  return true
@@ -31,7 +31,7 @@ export default class Trie {
     			  return false
   		  }
   		  if(letterMap.map[word[index]]){
-    		  return this.find(word,index+1,letterMap.map[word.charAt(index)])
+    		  return this.find(word,index+1,letterMap.map[word.toString().charAt(index)])
   		  }
   		  return false
 	  }

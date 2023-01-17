@@ -19,11 +19,11 @@ const eReplace = 'е';
 // }
 
 interface IWordVariations {
-    queryWords: Trie;
-    queryEWords: Trie;
-    queryMappedWords: Trie;
-    queryTransliteratedWords: Trie;
-    queryTransliteratedMappedWords: Trie;
+    words: Trie;
+    eWords: Trie;
+    mappedWords: Trie;
+    transliteratedWords: Trie;
+    transliteratedMappedWords: Trie;
 }
 
 export default class Query {
@@ -33,7 +33,7 @@ export default class Query {
     constructor(text: string = '') {
         this.query = '';
 
-        this.queryWordsVariants = { queryWords: new Trie() , queryMappedWords: new Trie(), queryEWords: new Trie(), queryTransliteratedWords: new Trie(), queryTransliteratedMappedWords: new Trie() };
+        this.queryWordsVariants = { words: new Trie() , mappedWords: new Trie(), eWords: new Trie(), transliteratedWords: new Trie(), transliteratedMappedWords: new Trie() };
         this.update(text);
     }
 
@@ -52,27 +52,32 @@ export default class Query {
     //     return { matches: [], weight: 0, queryWord: '', matchesRanges: [] };
     // }
 
+    // Для теста
+    transliterate(word: string) {
+        return transliterate(word);
+    }
+
     update(text: string = '') : boolean {
         if (text !== this.query) {
             this.query = normalize(text);
-            this.queryWordsVariants = { queryWords: new Trie(), queryMappedWords: new Trie(), queryEWords: new Trie(), queryTransliteratedWords: new Trie(), queryTransliteratedMappedWords: new Trie() };
+            this.queryWordsVariants = { words: new Trie() , mappedWords: new Trie(), eWords: new Trie(), transliteratedWords: new Trie(), transliteratedMappedWords: new Trie() };
             if (this.query.length > 2) {
                 this.query.split(allowedMappedChars)
                 .filter(Boolean)
                 .forEach(queryWord => {
                     const mapped = mapKeys(queryWord).toLowerCase();
 
-                    this.queryWordsVariants.queryTransliteratedMappedWords.insert(transliterate(mapped));
-                    this.queryWordsVariants.queryMappedWords.insert(mapped);
+                    transliterate(mapped).forEach((item: string) => this.queryWordsVariants.transliteratedMappedWords.insert(item));
+                    this.queryWordsVariants.mappedWords.insert(mapped);
                 })
             }
 
             this.query.split(allowedChars)
             .filter(Boolean)
             .forEach(queryWord => {
-                this.queryWordsVariants.queryWords.insert(queryWord);
-                this.queryWordsVariants.queryEWords.insert(queryWord.replace(eRegular, eReplace));
-                this.queryWordsVariants.queryTransliteratedWords.insert(transliterate(queryWord));
+                this.queryWordsVariants.words.insert(queryWord);
+                this.queryWordsVariants.eWords.insert(queryWord.replace(eRegular, eReplace));
+                transliterate(queryWord).forEach((item: string) => this.queryWordsVariants.transliteratedWords.insert(item));
             });
 
             return true;
@@ -85,7 +90,7 @@ export default class Query {
     //     return { matches: [], weight: 0, queryWord: '', matchesRanges: [] };
     // }
 
-    scoringSort() {
+    // scoringSort() {
 
-    }
+    // }
 }
